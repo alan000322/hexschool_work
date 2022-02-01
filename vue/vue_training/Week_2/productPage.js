@@ -11,41 +11,36 @@ createApp({
     methods: {
         checkLogin() {
             const token = document.cookie.replace(/(?:(?:^|.*;\s*)chiaToken\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-            console.log(token);
+            //console.log(token);
             axios.defaults.headers.common['Authorization'] = token;
             axios.post(`${apiUrl}/api/user/check`)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
                     this.getProducts();
                 })
                 .catch(err => {
-                    console.dir(err);
-                    window.location = './index.html'
+                    //console.dir(err);
+                    alert('登入錯誤')
                 })
         },
         getProducts() {
             // #5 取得後台產品列表
             axios.get(`${apiUrl}/api/${apiPath}/admin/products`)
                 .then(res => {
-                    console.log(res.data.products);
+                    //console.log(res.data.products);
                     this.Products = res.data.products;
-                    console.log(this.Products)
-                    Object.values(this.Products).forEach((item) => {
-                        console.log(item);
-                        })
+                    //console.log(this.Products)
+                    // Object.values(this.Products).forEach((item) => {
+                    //     console.log(item);
+                    //     })
                 })
                 .catch(err => {
-                    console.dir(err);
+                    //console.dir(err);
                 })
         },
         logOut() {
             axios.post(`${apiUrl}/logout`)
                 .then(res => {
-                    console.log(res)
-                    console.log('已登出')
-                    setTimeout(() => {
-                        
-                    }, 5000);
                     window.location = './index.html'
                 })
                 .catch(err => {

@@ -14,12 +14,11 @@ createApp({
     },
     methods: {
         Login() {
-            console.log(this.user)
             const apiUrl =  'https://vue3-course-api.hexschool.io/v2';
             // const apiPath =  'chiatzu-vue-hexschool';
             axios.post(`${apiUrl}/admin/signin`, this.user)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
                         // 解構
                     const {
                         token,
@@ -32,7 +31,7 @@ createApp({
                     window.location = './productPage.html'
                 })
                 .catch(err => {
-                    console.dir(err);
+                    //console.dir(err);
                 })
         }
     },
