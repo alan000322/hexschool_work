@@ -173,7 +173,7 @@ const app = createApp({
 });
 
 app.component('productModal', {
-    props: ['tempProduct'],
+    props: ['temp'],
     template: '#template4newModal'
 });
 
