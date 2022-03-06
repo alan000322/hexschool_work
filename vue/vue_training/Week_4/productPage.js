@@ -2,24 +2,24 @@ import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.
 import pagination from './pagination.js';
 const apiUrl = 'https://vue3-course-api.hexschool.io/v2';
 const apiPath = 'chiatzu-vue-hexschool';
-let edit_modal = '';
-let delete_modal = '';
-let new_modal = '';
+let productModal = '';
+let delProductModal = '';
 const app = createApp({
     components: {
-        pagination
+        pagination,
     },
     data() {
         return {
             // Product Management
-            Temp: {
+            tempProduct: {
                 imageUrl: [],
             },
+            isNew: false,
             Products: [],
             data_success_show: true,
             data_fail_show: true,
             data_success_remove_show: true,
-            error_message: '',
+            num: '',
             pagination: {},
         }
     }, // data
@@ -37,7 +37,6 @@ const app = createApp({
                 .catch(err => {
                     //console.dir(err);
                     alert('登入錯誤')
-                    window.location = './index.html'
                 })
         },
         logOut() {
@@ -50,7 +49,59 @@ const app = createApp({
 
                 })
         },
-        //Alert
+        
+
+        //Product Management
+        getProducts(page=1) {
+            // #5 取得後台產品列表
+            axios.get(`${apiUrl}/api/${apiPath}/admin/products?page=${page}`)
+                .then(res => {
+                    this.Products = res.data.products;
+                    this.pagination = res.data.pagination;
+                })
+                .catch(err => {
+                    //console.dir(err);
+                    alert('取得資料有問題');
+                })
+        },
+        // addNewProducts() {
+        //     //console.log(this.tempProduct.title)
+        //     let url = `${apiUrl}/api/${apiPath}/admin/product`;
+        //     axios.post(url, { data: this.Temp })
+        //     .then((res) => {
+        //         //console.log(res);
+        //         this.getProducts(); 
+        //         new_modal.hide();
+        //         this.successAlert();
+        //     })
+        //     .catch((err) => {
+        //         this.failAlert(err.data.message)
+                
+
+        //     })
+        // },
+        // editProducts() {
+        //     let url = `${apiUrl}/api/${apiPath}/admin/product/${this.tempProduct.id}`;
+        //     axios.put(url, { data: this.Temp })
+        //     .then((res) => {
+        //         //console.log(res);
+        //         this.getProducts(); 
+        //         this.successAlert();
+        //         edit_modal.hide();
+                
+                
+        //     })
+        //     .catch((err) => {
+        //         //console.log(err.data.message);
+        //         this.failAlert(err.data.message)
+
+        //     })
+        // },
+
+
+        //助教 week3 寫法 將編輯產品跟新增產品寫在同一個function，以isNew作判斷
+        
+//Alert
         successAlert() {
             this.data_success_show = false;
             //console.log(this.data_success_show);
@@ -69,113 +120,104 @@ const app = createApp({
                 //console.log('end', this.data_success_remove_show);
             }, 2000);
         },
-        failAlert(error) {
-            this.data_fail_show = false;
-            this.error_message = error
-            console.log(this.data_fail_show);
-            setTimeout(() => {
-                //console.log('start', this.data_fail_show);
-                this.data_fail_show = true;
-                //console.log('end', this.data_fail_show);
-            }, 5000);
-        },
 
-        //Product Management
-        getProducts(page=1) {
-            // #5 取得後台產品列表
-            // query 的用法
-            axios.get(`${apiUrl}/api/${apiPath}/admin/products?page=${page}`)
-                .then(res => {
-                    this.Products = res.data.products;
-                    this.pagination = res.data.pagination;
-                })
-                .catch(err => {
-                    //console.dir(err);
-                })
-        },
-        addNewProducts() {
-            //console.log(this.Temp.title)
-            let url = `${apiUrl}/api/${apiPath}/admin/product`;
-            axios.post(url, { data: this.Temp })
-            .then((res) => {
-                //console.log(res);
-                this.getProducts(); 
-                new_modal.hide();
-                this.successAlert();
-            })
-            .catch((err) => {
-                this.failAlert(err.data.message)
-                
-
-            })
-        },
-        editProducts() {
-            let url = `${apiUrl}/api/${apiPath}/admin/product/${this.Temp.id}`;
-            axios.put(url, { data: this.Temp })
-            .then((res) => {
-                //console.log(res);
-                this.getProducts(); 
-                this.successAlert();
-                edit_modal.hide();
-                
-                
-            })
-            .catch((err) => {
-                //console.log(err.data.message);
-                this.failAlert(err.data.message)
-
-            })
-        },
-        removeProducts() {
-            let url = `${apiUrl}/api/${apiPath}/admin/product/${this.Temp.id}`;
-            axios.delete(url, { data: this.Temp })
-            .then((res) => {
-                //console.log(res);
-                this.getProducts(); 
-                delete_modal.hide();
-                this.successremoveAlert();
-            })
-            .catch((err) => {
-                //console.log(err.data.message);
-                this.failAlert(err.data.message)
-
-            })
-        },
+        
 
         //Modal
-        openeditModal(item) {
-            this.Temp = {...item};
-            edit_modal.show();
+        openModal(isNew, item) {
+            if (isNew === 'new') {
+                this.tempProduct = {
+                    imagesUrl: [],
+                };
+            this.isNew = true;
+            productModal.show();
+            }  // 如果是建立新產品   //使用week3助教範例寫法
+            else if (isNew === 'edit') {
+                this.tempProduct = { ...item };
+                this.isNew = false;
+                productModal.show();
+            }   // 如果是編輯產品   //使用week3助教範例寫法
+            else if (isNew === 'del') {
+                this.tempProduct = { ...item };
+                delProductModal.show()
+            }    // 如果是刪除產品   //使用week3助教範例寫法
         },
-        closeeditModal(item) {
-            this.Temp = {...item};
-            edit_modal.hide();
-        },
-        deleteModal(item) {
-            this.Temp = {...item};
-            delete_modal.show();
-        },
-        openNewModal(item) {
-            this.Temp = {};
-            new_modal.show();
-        }
 
-
+        // Week3 助教寫法
+        
 
     }, // methods
     mounted() {
         this.checkLogin();
-        edit_modal = new bootstrap.Modal(document.querySelector('#editModal')); //# 原本在上方抓取dom元素，等待畫面完整以後才進行觸發
-        delete_modal = new bootstrap.Modal(document.querySelector('#deleteModal')); //# 原本在上方抓取dom元素，等待畫面完整以後才進行觸發
-        new_modal = new bootstrap.Modal(document.querySelector('#newModal')); //# 原本在上方抓取dom元素，等待畫面完整以後才進行觸發
+        //Modal
+        productModal = new bootstrap.Modal(document.getElementById('productModal'), {
+            keyboard: false
+        });
+        delProductModal = new bootstrap.Modal(document.getElementById('delProductModal'), {
+            keyboard: false
+        });
     },
 
 });
 
 app.component('productModal', {
-    props: ['temp'],
-    template: '#template4newModal'
-});
+    props: ['tempProduct', 'isNew'],
+    template: `#templateForProductModel`,
+    methods: {
+        updateProduct() {
+            //預設：新增產品
+            let url = `${apiUrl}/api/${apiPath}/admin/product`;
+            let http = 'post';
+            
+            //編輯產品 -> 如果不是新產品
+            if (!this.isNew) {
+                url = `${apiUrl}/api/${apiPath}/admin/product/${this.tempProduct.id}`;
+                http = 'put'
+            }
+            
+            axios[http](url, { data: this.tempProduct }).then((response) => {
+                // alert(response.data.message);
+                //this.successAlert(); //外層方法
+                this.$emit('success-alert')
+                productModal.hide();
+                //this.getProducts(); //外層方法
+                this.$emit('get-products')
+            }).catch((err) => {
+                console.log(err)
+                alert(err.data.message);
+            })
+        },
+        createImages() {
+            this.tempProduct.imagesUrl = [];
+            this.tempProduct.imagesUrl.push('');
+        ``},
+        
+    }
 
+});
+app.component('delProductModal', {
+    props: ['tempProduct'],
+    template: `#templateFordelProductModel`,
+    methods: {
+        removeProducts() {
+            let url = `${apiUrl}/api/${apiPath}/admin/product/${this.tempProduct.id}`;
+            axios.delete(url, { data: this.Temp })
+            .then((res) => {
+                //console.log(res);
+                //this.getProducts(); //外層
+                this.$emit('get-products')
+                delProductModal.hide();
+                //this.successremoveAlert(); //外層
+                this.$emit('successremove-alert')
+
+            })
+            .catch((err) => {
+                console.log(err.data.message);
+                alert(err.data.message)
+
+            })
+        },
+    }
+})
 
 app.mount('#app');
